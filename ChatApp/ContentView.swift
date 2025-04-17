@@ -71,7 +71,9 @@ struct ContentView: View {
                     Menu {
                         Button(
                             "gpt-3.5-turbo",
-                            action: { appState.currentAIModel = "gpt-3.5-turbo" })
+                            action: {
+                                appState.currentAIModel = "gpt-3.5-turbo"
+                            })
                         Button(
                             "gpt-4.1",
                             action: { appState.currentAIModel = "gpt-4.1" })
@@ -79,10 +81,10 @@ struct ContentView: View {
                             "gpt-4o",
                             action: { appState.currentAIModel = "gpt-4o" })
                         Button(
-                            "gpt-4o-search-preview",
+                            "gpt-4.1-mini",
                             action: {
                                 appState.currentAIModel =
-                                    "gpt-4o-search-preview"
+                                    "gpt-4.1-mini"
                             }
                         )
                     } label: {

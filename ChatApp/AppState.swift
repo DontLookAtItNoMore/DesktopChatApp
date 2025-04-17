@@ -126,20 +126,8 @@ class AppState: ObservableObject {
         }
     }
 
-    func printFormattedMessagesJSON() -> String {
-        let openAIMessages = formattedMessagesForOpenAI()
-
-        if let jsonData = try? JSONEncoder().encode(openAIMessages),
-            let jsonString = String(data: jsonData, encoding: .utf8)
-        {
-            return jsonString
-        }
-
-        return "Error converting to JSON"
-    }
-
     func sendToOpenAI(apiKey: String, completion: @escaping (String?) -> Void) {
-        let messages = printFormattedMessagesJSON()
+        let messages = formattedMessagesForOpenAI()
         guard
             let url = URL(string: "https://api.openai.com/v1/chat/completions")
         else {
@@ -154,7 +142,7 @@ class AppState: ObservableObject {
         request.addValue("application/json", forHTTPHeaderField: "Content-Type")
 
         let body: [String: Any] = [
-            "model": "gpt-3.5-turbo",
+            "model": currentAIModel,
             "messages": messages,
             "temperature": 0.7,
         ]

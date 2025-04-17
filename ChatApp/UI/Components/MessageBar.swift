@@ -20,7 +20,10 @@ struct MessageBar: View {
                     appState.addMessage(appState.messageBarText, isOwn: true)
                     appState.messageBarText = ""
 
-                    appState.sendToOpenAI(apiKey: "sk-...") { response in
+                    appState.sendToOpenAI(
+                        apiKey:
+                            ""
+                    ) { response in
                         DispatchQueue.main.async {
                             if let reply = response {
                                 appState.addMessage(reply, isOwn: false)
