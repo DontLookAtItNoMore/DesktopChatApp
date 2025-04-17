@@ -10,7 +10,7 @@ import SwiftUI
 @main
 struct ChatAppApp: App {
     @StateObject private var appState = AppState()
-    
+
     var body: some Scene {
         WindowGroup {
             ContentView()
@@ -19,28 +19,34 @@ struct ChatAppApp: App {
                     minWidth: 660, maxWidth: 1200,
                     minHeight: 290, maxHeight: 600
                 )
-                .background(WindowConfigurator())
+                #if os(macOS)
+                    .background(WindowConfigurator())
+                #endif
         }
         .windowResizability(.contentSize)
-        .windowStyle(.hiddenTitleBar)
+        #if os(macOS)
+            .windowToolbarStyle(.unified)
+            .windowStyle(.hiddenTitleBar)
+        #endif
     }
 }
 
-struct WindowConfigurator: NSViewRepresentable {
-    func makeNSView(context: Context) -> NSView {
-        let view = NSView()
+#if os(macOS)
+    struct WindowConfigurator: NSViewRepresentable {
+        func makeNSView(context: Context) -> NSView {
+            let view = NSView()
 
-        DispatchQueue.main.async {
-            if let window = view.window {
-                window.titlebarAppearsTransparent = true
-                window.titleVisibility = .hidden
-                window.isOpaque = false
-                window.backgroundColor = .clear
+            DispatchQueue.main.async {
+                if let window = view.window {
+                    window.titlebarAppearsTransparent = false
+                    window.isOpaque = false
+                    window.backgroundColor = .clear
+                }
             }
+
+            return view
         }
 
-        return view
+        func updateNSView(_ nsView: NSView, context: Context) {}
     }
-
-    func updateNSView(_ nsView: NSView, context: Context) {}
-}
+#endif

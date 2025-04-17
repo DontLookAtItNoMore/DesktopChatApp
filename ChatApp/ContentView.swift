@@ -9,37 +9,86 @@ import SwiftUI
 
 struct ContentView: View {
     @EnvironmentObject var appState: AppState
-    @FocusState private var isFocused: Bool
 
     var body: some View {
         ZStack {
             Color.clear
                 .background(.thinMaterial)
-                .contentShape(Rectangle())
-                .onTapGesture {
-                    appState.isSearchFocused = false
-                    appState.isMessageFocused = false
+
+            NavigationSplitView {
+                SideBar()
+                    .frame(minWidth: 320, maxHeight: .infinity)
+                    .background(.thinMaterial)
+            } detail: {
+                PrimaryView()
+            }
+            .onTapGesture {
+                appState.searchBarFocus = false
+                appState.messageBarFocus = false
+            }
+            .toolbar {
+                ToolbarItem(placement: .navigation) {
+                    Button {
+                        appState.searchBarText = ""
+
+                        let newThread = Thread(
+                            name: "New Chat",
+                            messages: [],
+                            lastMessageDate: Date(),
+                            createdAt: Date()
+                        )
+
+                        withAnimation {
+                            appState.threads.insert(newThread, at: 0)
+                        }
+
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.005)
+                        {
+                            appState.currentThread = newThread.id.uuidString
+                        }
+
+                        appState.currentThread = newThread.id.uuidString
+
+                    } label: {
+                        Label("New Chat", systemImage: "plus")
+                    }
+
                 }
 
-            HStack(spacing: 0) {
-                ListView()
-                    .frame(maxWidth: 300)
-                    .padding(16)
-                    .onTapGesture {
-                        appState.isMessageFocused = false
-                        appState.isSearchFocused = false
+                ToolbarItem(placement: .navigation) {
+                    Button {
+                        withAnimation {
+                            appState.deleteCurrentThread()
+                            appState.currentThread =
+                                appState.threads.first?.id.uuidString ?? ""
+                        }
+                    } label: {
+                        Label("New Chat", systemImage: "delete.left")
                     }
+                }
 
-                Rectangle()
-                    .fill(Color.black)
-                    .frame(width: 1)
-                    .edgesIgnoringSafeArea(.vertical)
-
-                ChatView()
-                    .onTapGesture {
-                        appState.isSearchFocused = false
-                        appState.isMessageFocused = false
+                ToolbarItem(placement: .navigation) {
+                    Menu {
+                        Button(
+                            "gpt-3.5-turbo",
+                            action: { appState.currentAIModel = "gpt-3.5-turbo" })
+                        Button(
+                            "gpt-4.1",
+                            action: { appState.currentAIModel = "gpt-4.1" })
+                        Button(
+                            "gpt-4o",
+                            action: { appState.currentAIModel = "gpt-4o" })
+                        Button(
+                            "gpt-4o-search-preview",
+                            action: {
+                                appState.currentAIModel =
+                                    "gpt-4o-search-preview"
+                            }
+                        )
+                    } label: {
+                        Text(appState.currentAIModel)
                     }
+                }
             }
         }
     }
